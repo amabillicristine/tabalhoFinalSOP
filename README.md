@@ -81,7 +81,37 @@ LRU:  8 page faults (40.00% da taxa de falta)
 
 - `main.c`: Código fonte do simulador
 - `referencias.txt`: Arquivo de exemplo com referências de páginas
+- `vsim-gcc.txt`: Arquivo grande com referências reais (5+ milhões de referências)
+- `teste_pequeno.txt`: Arquivo pequeno para testes rápidos
 - `README.md`: Esta documentação
+- `Makefile`: Para facilitar compilação e testes
+
+## Testes com arquivo vsim-gcc
+
+O projeto inclui um arquivo real de referências de páginas (`vsim-gcc.txt`) com mais de 5 milhões de referências. Para testes práticos, use amostras menores:
+
+### Resultados de exemplo (50 referências, diferentes números de quadros):
+
+**Com 4 quadros:**
+- FIFO: 39 page faults (78.00%)
+- OPT: 30 page faults (60.00%) 
+- LRU: 38 page faults (76.00%)
+
+**Com 8 quadros:**
+- FIFO: 33 page faults (66.00%)
+- OPT: 27 page faults (54.00%)
+- LRU: 32 page faults (64.00%)
+
+### Comandos para teste com vsim-gcc:
+
+```bash
+# Testar com primeiras 50 referências e 4 quadros
+Get-Content vsim-gcc.txt | Select-Object -First 50 | .\simula_memoria_virtual.exe 4
+
+# Testar com diferentes números de quadros
+Get-Content vsim-gcc.txt | Select-Object -First 100 | .\simula_memoria_virtual.exe 8
+Get-Content vsim-gcc.txt | Select-Object -First 100 | .\simula_memoria_virtual.exe 16
+```
 
 ## Implementação
 
