@@ -1,316 +1,147 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <limits.h>
-#include <stdbool.h>
 
-#define MAX_REFERENCES 1000
-#define MAX_PAGES 100
+#define MAX_REFS 100000
 
-// Estrutura para armazenar as referências
-typedef struct {
-    int pages[MAX_REFERENCES];
-    int count;
-} References;
-
-// Função para ler as referências da entrada padrão
-References read_references() {
-    References refs;
-    refs.count = 0;
-    int page;
-    
-    while (scanf("%d", &page) == 1 && refs.count < MAX_REFERENCES) {
-        refs.pages[refs.count++] = page;
-    }
-    
-    return refs;
-}
-
-// Função para verificar se uma página está na memória
-bool is_page_in_memory(int *memory, int num_frames, int page) {
-    for (int i = 0; i < num_frames; i++) {
-        if (memory[i] == page) {
-            return true;
-        }
-    }
-    return false;
-}
-
-// Função para encontrar uma posição vazia na memória
-int find_empty_frame(int *memory, int num_frames) {
-    for (int i = 0; i < num_frames; i++) {
-        if (memory[i] == -1) {
-            return i;
-        }
-    }
-    return -1;
-}
-
-// Algoritmo FIFO
-int simulate_fifo(References refs, int num_frames) {
-    int *memory = (int*)malloc(num_frames * sizeof(int));
+// FIFO
+int simula_fifo(int frames, int* refs, int n_refs) {
+    int memoria[frames];
+    int pos = 0;
     int page_faults = 0;
-    int fifo_index = 0;
-    
-    // Inicializar memória
-    for (int i = 0; i < num_frames; i++) {
-        memory[i] = -1;
-    }
-    
-    printf("\n=== ALGORITMO FIFO ===\n");
-    printf("Referências: ");
-    for (int i = 0; i < refs.count; i++) {
-        printf("%d ", refs.pages[i]);
-    }
-    printf("\n");
-    
-    for (int i = 0; i < refs.count; i++) {
-        int page = refs.pages[i];
-        
-        if (!is_page_in_memory(memory, num_frames, page)) {
-            // Page fault
-            page_faults++;
-            
-            // Encontrar posição vazia ou usar FIFO
-            int frame = find_empty_frame(memory, num_frames);
-            if (frame == -1) {
-                frame = fifo_index;
-                fifo_index = (fifo_index + 1) % num_frames;
-            }
-            
-            memory[frame] = page;
-            
-            printf("Página %d - FAULT | Memória: ", page);
-            for (int j = 0; j < num_frames; j++) {
-                if (memory[j] == -1) {
-                    printf("[ ] ");
-                } else {
-                    printf("[%d] ", memory[j]);
-                }
-            }
-            printf("\n");
-        } else {
-            printf("Página %d - HIT   | Memória: ", page);
-            for (int j = 0; j < num_frames; j++) {
-                if (memory[j] == -1) {
-                    printf("[ ] ");
-                } else {
-                    printf("[%d] ", memory[j]);
-                }
-            }
-            printf("\n");
-        }
-    }
-    
-    free(memory);
-    return page_faults;
-}
+    int i, j, encontrado;
 
-// Algoritmo OPT
-int simulate_opt(References refs, int num_frames) {
-    int *memory = (int*)malloc(num_frames * sizeof(int));
-    int page_faults = 0;
-    
-    // Inicializar memória
-    for (int i = 0; i < num_frames; i++) {
-        memory[i] = -1;
+    for (i = 0; i < frames; i++) {
+        memoria[i] = -1;
     }
-    
-    printf("\n=== ALGORITMO OPT ===\n");
-    printf("Referências: ");
-    for (int i = 0; i < refs.count; i++) {
-        printf("%d ", refs.pages[i]);
-    }
-    printf("\n");
-    
-    for (int i = 0; i < refs.count; i++) {
-        int page = refs.pages[i];
-        
-        if (!is_page_in_memory(memory, num_frames, page)) {
-            // Page fault
-            page_faults++;
-            
-            // Encontrar posição vazia
-            int frame = find_empty_frame(memory, num_frames);
-            
-            if (frame == -1) {
-                // Encontrar a página que será usada mais tarde (ou nunca)
-                int farthest = -1;
-                int victim_frame = 0;
-                
-                for (int j = 0; j < num_frames; j++) {
-                    int next_use = INT_MAX;
-                    
-                    // Procurar próxima ocorrência desta página
-                    for (int k = i + 1; k < refs.count; k++) {
-                        if (refs.pages[k] == memory[j]) {
-                            next_use = k;
-                            break;
-                        }
-                    }
-                    
-                    if (next_use > farthest) {
-                        farthest = next_use;
-                        victim_frame = j;
-                    }
-                }
-                
-                frame = victim_frame;
-            }
-            
-            memory[frame] = page;
-            
-            printf("Página %d - FAULT | Memória: ", page);
-            for (int j = 0; j < num_frames; j++) {
-                if (memory[j] == -1) {
-                    printf("[ ] ");
-                } else {
-                    printf("[%d] ", memory[j]);
-                }
-            }
-            printf("\n");
-        } else {
-            printf("Página %d - HIT   | Memória: ", page);
-            for (int j = 0; j < num_frames; j++) {
-                if (memory[j] == -1) {
-                    printf("[ ] ");
-                } else {
-                    printf("[%d] ", memory[j]);
-                }
-            }
-            printf("\n");
-        }
-    }
-    
-    free(memory);
-    return page_faults;
-}
 
-// Algoritmo LRU
-int simulate_lru(References refs, int num_frames) {
-    int *memory = (int*)malloc(num_frames * sizeof(int));
-    int *last_used = (int*)malloc(num_frames * sizeof(int));
-    int page_faults = 0;
-    
-    // Inicializar memória e contadores
-    for (int i = 0; i < num_frames; i++) {
-        memory[i] = -1;
-        last_used[i] = -1;
-    }
-    
-    printf("\n=== ALGORITMO LRU ===\n");
-    printf("Referências: ");
-    for (int i = 0; i < refs.count; i++) {
-        printf("%d ", refs.pages[i]);
-    }
-    printf("\n");
-    
-    for (int i = 0; i < refs.count; i++) {
-        int page = refs.pages[i];
-        
-        // Verificar se a página já está na memória
-        int page_frame = -1;
-        for (int j = 0; j < num_frames; j++) {
-            if (memory[j] == page) {
-                page_frame = j;
+    for (i = 0; i < n_refs; i++) {
+        encontrado = 0;
+        for (j = 0; j < frames; j++) {
+            if (memoria[j] == refs[i]) {
+                encontrado = 1;
                 break;
             }
         }
-        
-        if (page_frame != -1) {
-            // Hit: atualizar tempo de uso
-            last_used[page_frame] = i;
-            
-            printf("Página %d - HIT   | Memória: ", page);
-            for (int j = 0; j < num_frames; j++) {
-                if (memory[j] == -1) {
-                    printf("[ ] ");
-                } else {
-                    printf("[%d] ", memory[j]);
-                }
-            }
-            printf("\n");
-        } else {
-            // Page fault
+
+        if (!encontrado) {
+            memoria[pos] = refs[i];
+            pos = (pos + 1) % frames;
             page_faults++;
-            
-            // Encontrar posição vazia
-            int frame = find_empty_frame(memory, num_frames);
-            
-            if (frame == -1) {
-                // Encontrar a página menos recentemente usada
-                int lru_time = INT_MAX;
-                int lru_frame = 0;
-                
-                for (int j = 0; j < num_frames; j++) {
-                    if (last_used[j] < lru_time) {
-                        lru_time = last_used[j];
-                        lru_frame = j;
-                    }
-                }
-                
-                frame = lru_frame;
-            }
-            
-            memory[frame] = page;
-            last_used[frame] = i;
-            
-            printf("Página %d - FAULT | Memória: ", page);
-            for (int j = 0; j < num_frames; j++) {
-                if (memory[j] == -1) {
-                    printf("[ ] ");
-                } else {
-                    printf("[%d] ", memory[j]);
-                }
-            }
-            printf("\n");
         }
     }
-    
-    free(memory);
-    free(last_used);
+
     return page_faults;
 }
 
-int main(int argc, char *argv[]) {
+// LRU
+int simula_lru(int frames, int* refs, int n_refs) {
+    int memoria[frames];
+    int ultima_vez[frames];
+    int page_faults = 0;
+    int i, j, encontrado;
+
+    for (i = 0; i < frames; i++) {
+        memoria[i] = -1;
+        ultima_vez[i] = -1;
+    }
+
+    for (i = 0; i < n_refs; i++) {
+        encontrado = 0;
+        for (j = 0; j < frames; j++) {
+            if (memoria[j] == refs[i]) {
+                ultima_vez[j] = i;
+                encontrado = 1;
+                break;
+            }
+        }
+
+        if (!encontrado) {
+            int lru_index = 0;
+            for (j = 1; j < frames; j++) {
+                if (ultima_vez[j] < ultima_vez[lru_index]) {
+                    lru_index = j;
+                }
+            }
+            memoria[lru_index] = refs[i];
+            ultima_vez[lru_index] = i;
+            page_faults++;
+        }
+    }
+
+    return page_faults;
+}
+
+// Otimo (OPT)
+int simula_opt(int frames, int* refs, int n_refs) {
+    int memoria[frames];
+    int page_faults = 0;
+    int i, j, k, encontrado;
+
+    for (i = 0; i < frames; i++) {
+        memoria[i] = -1;
+    }
+
+    for (i = 0; i < n_refs; i++) {
+        encontrado = 0;
+        for (j = 0; j < frames; j++) {
+            if (memoria[j] == refs[i]) {
+                encontrado = 1;
+                break;
+            }
+        }
+
+        if (!encontrado) {
+            int substitui_index = -1;
+            int mais_distante = -1;
+
+            for (j = 0; j < frames; j++) {
+                int distancia = -1;
+                for (k = i + 1; k < n_refs; k++) {
+                    if (memoria[j] == refs[k]) {
+                        distancia = k;
+                        break;
+                    }
+                }
+
+                if (distancia == -1) { // Nunca mais sera usada
+                    substitui_index = j;
+                    break;
+                }
+
+                if (distancia > mais_distante) {
+                    mais_distante = distancia;
+                    substitui_index = j;
+                }
+            }
+
+            memoria[substitui_index] = refs[i];
+            page_faults++;
+        }
+    }
+
+    return page_faults;
+}
+
+int main(int argc, char* argv[]) {
     if (argc != 2) {
-        printf("Uso: %s <numero_de_quadros>\n", argv[0]);
-        printf("Exemplo: %s 4 < referencias.txt\n", argv[0]);
         return 1;
     }
-    
-    int num_frames = atoi(argv[1]);
-    if (num_frames <= 0) {
-        printf("Erro: O número de quadros deve ser maior que 0\n");
-        return 1;
+
+    int num_quadros = atoi(argv[1]);
+    int referencias[MAX_REFS];
+    int total_refs = 0;
+    int valor;
+
+    while (scanf("%d", &valor) == 1 && total_refs < MAX_REFS) {
+        referencias[total_refs++] = valor;
     }
-    
-    printf("Simulador de Algoritmos de Substituição de Páginas\n");
-    printf("Número de quadros na RAM: %d\n", num_frames);
-    
-    // Ler referências
-    References refs = read_references();
-    
-    if (refs.count == 0) {
-        printf("Erro: Nenhuma referência foi lida\n");
-        return 1;
-    }
-    
-    printf("Total de referências lidas: %d\n", refs.count);
-    
-    // Simular algoritmos
-    int fifo_faults = simulate_fifo(refs, num_frames);
-    int opt_faults = simulate_opt(refs, num_frames);
-    int lru_faults = simulate_lru(refs, num_frames);
-    
-    // Mostrar resultados
-    printf("\n=== RESULTADOS ===\n");
-    printf("FIFO: %d page faults (%.2f%% da taxa de falta)\n", 
-           fifo_faults, (float)fifo_faults / refs.count * 100);
-    printf("OPT:  %d page faults (%.2f%% da taxa de falta)\n", 
-           opt_faults, (float)opt_faults / refs.count * 100);
-    printf("LRU:  %d page faults (%.2f%% da taxa de falta)\n", 
-           lru_faults, (float)lru_faults / refs.count * 100);
-    
+
+    int pf_fifo = simula_fifo(num_quadros, referencias, total_refs);
+    int pf_lru  = simula_lru(num_quadros, referencias, total_refs);
+    int pf_opt  = simula_opt(num_quadros, referencias, total_refs);
+
+    printf("%5d quadros, %7d refs: FIFO: %5d PFs, LRU: %5d PFs, OPT: %5d PFs\n",
+           num_quadros, total_refs, pf_fifo, pf_lru, pf_opt);
+
     return 0;
 }

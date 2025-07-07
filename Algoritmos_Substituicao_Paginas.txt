@@ -1,0 +1,271 @@
+ALGORITMOS DE SUBSTITUIÇÃO DE PÁGINAS EM MEMÓRIA VIRTUAL
+===========================================================
+
+1. INTRODUÇÃO
+=============
+
+A memória virtual é uma técnica que permite ao sistema operacional usar mais memória 
+do que está fisicamente disponível na RAM. Isso é feito dividindo a memória em pequenos
+blocos chamados "páginas" e mantendo apenas algumas dessas páginas na RAM por vez.
+
+Quando um programa tenta acessar uma página que não está na RAM (chamado de "page fault"
+ou "falta de página"), o sistema operacional precisa decidir qual página remover da 
+RAM para fazer espaço para a nova página. Essa decisão é feita pelos algoritmos de 
+substituição de páginas.
+
+2. CONCEITOS FUNDAMENTAIS
+=========================
+
+PÁGINA: Bloco fixo de memória virtual (ex: 4KB)
+QUADRO: Espaço físico na RAM que pode conter uma página
+PAGE FAULT: Quando uma página referenciada não está na RAM
+HIT: Quando uma página referenciada já está na RAM
+REFERÊNCIA: Acesso a uma página específica pelo programa
+
+Exemplo visual:
+RAM com 3 quadros: [Pág1] [Pág3] [Pág7]
+Se o programa tentar acessar Pág5 → PAGE FAULT!
+Se o programa tentar acessar Pág3 → HIT!
+
+3. ALGORITMO FIFO (FIRST IN, FIRST OUT)
+=======================================
+
+CONCEITO:
+Remove sempre a página que está há MAIS TEMPO na memória, independente de como 
+ela foi usada recentemente.
+
+COMO FUNCIONA:
+- Mantém um índice circular apontando para o próximo quadro a ser substituído
+- Quando há page fault, substitui a página no quadro apontado
+- Avança o índice para o próximo quadro
+
+EXEMPLO PRÁTICO:
+Referências: 1, 2, 3, 4, 1, 2, 5
+Quadros disponíveis: 3
+
+Passo 1: Ref=1 → [1] [ ] [ ] → PAGE FAULT (total: 1)
+Passo 2: Ref=2 → [1] [2] [ ] → PAGE FAULT (total: 2)  
+Passo 3: Ref=3 → [1] [2] [3] → PAGE FAULT (total: 3)
+Passo 4: Ref=4 → [4] [2] [3] → PAGE FAULT (substitui 1, total: 4)
+Passo 5: Ref=1 → [4] [1] [3] → PAGE FAULT (substitui 2, total: 5)
+Passo 6: Ref=2 → [4] [1] [2] → PAGE FAULT (substitui 3, total: 6)
+Passo 7: Ref=5 → [5] [1] [2] → PAGE FAULT (substitui 4, total: 7)
+
+Total de Page Faults: 7
+
+VANTAGENS:
+- Simples de implementar
+- Baixo overhead computacional
+- Justo (todas as páginas têm igual chance de permanência)
+
+DESVANTAGENS:
+- Não considera frequência de uso
+- Pode remover páginas muito utilizadas
+- Performance pode ser ruim para alguns padrões de acesso
+
+4. ALGORITMO LRU (LEAST RECENTLY USED)
+======================================
+
+CONCEITO:
+Remove a página que foi usada há MAIS TEMPO no passado, assumindo que páginas 
+usadas recentemente têm maior probabilidade de serem usadas novamente.
+
+COMO FUNCIONA:
+- Mantém um registro de quando cada página foi usada pela última vez
+- Quando há page fault, encontra a página com o tempo de uso mais antigo
+- Substitui essa página pela nova
+
+EXEMPLO PRÁTICO:
+Referências: 1, 2, 3, 4, 1, 2, 5
+Quadros disponíveis: 3
+
+Passo 1: Ref=1 → [1] [ ] [ ] → PAGE FAULT, última_vez[0]=0 (total: 1)
+Passo 2: Ref=2 → [1] [2] [ ] → PAGE FAULT, última_vez[1]=1 (total: 2)
+Passo 3: Ref=3 → [1] [2] [3] → PAGE FAULT, última_vez[2]=2 (total: 3)
+Passo 4: Ref=4 → [4] [2] [3] → PAGE FAULT, substitui 1 (mais antiga), total: 4)
+Passo 5: Ref=1 → [1] [2] [3] → PAGE FAULT, substitui 4 (mais antiga), total: 5)
+Passo 6: Ref=2 → [1] [2] [3] → HIT, atualiza última_vez[1]=5 (total: 5)
+Passo 7: Ref=5 → [1] [2] [5] → PAGE FAULT, substitui 3 (mais antiga), total: 6)
+
+Total de Page Faults: 6
+
+IMPLEMENTAÇÃO:
+- Array ultima_vez[] armazena quando cada quadro foi usado
+- No hit: atualiza ultima_vez[quadro] = tempo_atual
+- No fault: encontra quadro com menor ultima_vez[]
+
+VANTAGENS:
+- Boa performance para a maioria dos programas
+- Considera o padrão temporal de acesso
+- Algoritmo prático e eficiente
+
+DESVANTAGENS:
+- Overhead para manter histórico de uso
+- Não é ótimo (pode não dar o menor número de page faults)
+- Complexidade maior que FIFO
+
+5. ALGORITMO OPT (OPTIMAL/ÓTIMO)
+===============================
+
+CONCEITO:
+Remove a página que será usada MAIS TARDE no futuro (ou nunca mais será usada).
+É o algoritmo teoricamente perfeito, mas impraticável na vida real.
+
+COMO FUNCIONA:
+- Para cada página na memória, verifica quando ela será usada novamente
+- Remove a página que será usada mais distante no futuro
+- Se uma página nunca mais será usada, ela é escolhida primeiro
+
+EXEMPLO PRÁTICO:
+Referências: 1, 2, 3, 4, 1, 2, 5
+Quadros disponíveis: 3
+
+Passo 1: Ref=1 → [1] [ ] [ ] → PAGE FAULT (total: 1)
+Passo 2: Ref=2 → [1] [2] [ ] → PAGE FAULT (total: 2)
+Passo 3: Ref=3 → [1] [2] [3] → PAGE FAULT (total: 3)
+Passo 4: Ref=4 → [1] [2] [4] → PAGE FAULT, remove 3 (nunca mais usada), total: 4)
+Passo 5: Ref=1 → [1] [2] [4] → HIT (total: 4)
+Passo 6: Ref=2 → [1] [2] [4] → HIT (total: 4)
+Passo 7: Ref=5 → [1] [2] [5] → PAGE FAULT, remove 4 (nunca mais usada), total: 5)
+
+Total de Page Faults: 5
+
+ANÁLISE PARA SUBSTITUIÇÃO NO PASSO 4:
+- Página 1: próximo uso na posição 4 (ref=1)
+- Página 2: próximo uso na posição 5 (ref=2)  
+- Página 3: nunca mais será usada → ESCOLHIDA!
+
+VANTAGENS:
+- Algoritmo ótimo (menor número possível de page faults)
+- Benchmark teórico para outros algoritmos
+- Útil para análise e comparação
+
+DESVANTAGENS:
+- Impossível de implementar na prática
+- Requer conhecimento do futuro
+- Usado apenas para fins acadêmicos/teóricos
+
+6. COMPARAÇÃO DOS ALGORITMOS
+============================
+
+Para o exemplo: Referências 1,2,3,4,1,2,5 com 3 quadros
+
+FIFO: 7 page faults
+LRU:  6 page faults  
+OPT:  5 page faults (ótimo)
+
+CARACTERÍSTICAS:
+
+FIFO:
++ Simplicidade máxima
++ Implementação rápida
+- Performance pode ser ruim
+- Não considera padrão de uso
+
+LRU:
++ Boa performance prática
++ Considera localidade temporal
++ Implementável na prática
+- Overhead de manutenção
+- Não é ótimo
+
+OPT:
++ Performance ótima garantida
++ Padrão de comparação
+- Impossível na prática
+- Apenas valor teórico
+
+7. IMPLEMENTAÇÃO PRÁTICA
+========================
+
+ESTRUTURAS DE DADOS:
+
+FIFO:
+- Array memoria[frames]: páginas na RAM
+- int pos: próxima posição a substituir
+
+LRU:
+- Array memoria[frames]: páginas na RAM  
+- Array ultima_vez[frames]: timestamp do último uso
+
+OPT:
+- Array memoria[frames]: páginas na RAM
+- Busca à frente nas referências futuras
+
+PSEUDOCÓDIGO GERAL:
+
+Para cada referência:
+  1. Verificar se página está na memória
+  2. Se SIM (HIT):
+     - Atualizar estruturas se necessário (LRU)
+  3. Se NÃO (PAGE FAULT):
+     - Encontrar vítima segundo algoritmo
+     - Substituir vítima pela nova página
+     - Incrementar contador de page faults
+
+8. FATORES QUE AFETAM PERFORMANCE
+================================
+
+TAMANHO DA MEMÓRIA:
+- Mais quadros = menos page faults
+- Relação não é sempre linear
+
+PADRÃO DE ACESSO:
+- Sequencial: FIFO funciona bem
+- Aleatório: LRU geralmente melhor
+- Localidade: LRU tem vantagem
+
+ANOMALIA DE BELADY:
+- Em alguns casos, MAIS memória pode causar MAIS page faults
+- Acontece principalmente com FIFO
+- LRU não sofre dessa anomalia
+
+9. APLICAÇÕES PRÁTICAS
+======================
+
+SISTEMAS OPERACIONAIS REAIS:
+- Linux: Aproximação de LRU com Clock Algorithm
+- Windows: Working Set + LRU aproximado
+- Android: LRU com considerações de prioridade
+
+ESCOLHA DO ALGORITMO:
+- FIFO: Sistemas simples, recursos limitados
+- LRU: Maioria dos sistemas modernos
+- Variações: Clock, Second Chance, etc.
+
+10. EXERCÍCIOS PARA FIXAÇÃO
+===========================
+
+EXERCÍCIO 1:
+Simule manualmente os 3 algoritmos para:
+Referências: 7,0,1,2,0,3,0,4,2,3,0,3,2
+Quadros: 3
+
+EXERCÍCIO 2:
+Compare os resultados com diferentes números de quadros (1,2,3,4,5)
+para a mesma sequência de referências.
+
+EXERCÍCIO 3:
+Encontre um exemplo onde FIFO tem performance pior que LRU
+e explique por quê.
+
+RESPOSTA EXERCÍCIO 1:
+FIFO: 9 page faults
+LRU:  10 page faults
+OPT:  7 page faults
+
+11. CONCLUSÃO
+=============
+
+Os algoritmos de substituição de páginas são fundamentais para o funcionamento
+eficiente da memória virtual. Cada um tem suas características:
+
+- OPT é o padrão teórico ótimo
+- LRU oferece boa performance prática  
+- FIFO é simples mas pode ser ineficiente
+
+A escolha depende dos recursos disponíveis, padrão de acesso da aplicação
+e requisitos de performance do sistema.
+
+O estudo desses algoritmos ajuda a entender como sistemas operacionais
+gerenciam memória e como otimizar programas para melhor uso da memória.

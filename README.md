@@ -1,124 +1,149 @@
 # Simulador de Algoritmos de Substituição de Páginas
 
-Este programa implementa e simula três algoritmos de substituição de páginas utilizados no gerenciamento de memória virtual:
+Este programa simula três algoritmos clássicos de substituição de páginas em sistemas de memória virtual:
+- **FIFO** (First In, First Out)
+- **LRU** (Least Recently Used)
+- **OPT** (Optimal/Ótimo)
 
-- **FIFO (First In, First Out)**: Remove a página que está há mais tempo na memória
-- **OPT (Algoritmo Ótimo)**: Remove a página que será referenciada mais tarde no futuro (ou nunca)
-- **LRU (Least Recently Used)**: Remove a página que foi menos recentemente utilizada
+## 📋 Pré-requisitos
 
-## Compilação
+- Compilador GCC instalado no sistema
+- Sistema operacional Windows (CMD ou PowerShell)
 
-Para compilar o programa, execute:
+## 🔨 Compilação
 
-```bash
-gcc main.c -o simula_memoria_virtual
-```
-
-## Uso
-
-O programa recebe como parâmetro o número de quadros disponíveis na RAM e lê as referências às páginas da entrada padrão (stdin):
+Para compilar o programa, execute o seguinte comando no terminal:
 
 ```bash
-./simula_memoria_virtual <numero_de_quadros> < arquivo_referencias.txt
+gcc main.c -o main.exe
 ```
 
-### Exemplo de uso:
+## 🚀 Execução
 
+### Sintaxe
 ```bash
-./simula_memoria_virtual 4 < referencias.txt
+main.exe <numero_de_quadros> < arquivo_de_referencias
 ```
 
-ou no PowerShell:
+Onde:
+- `<numero_de_quadros>`: Número de quadros de página disponíveis na memória
+- `<arquivo_de_referencias>`: Arquivo contendo a sequência de referências às páginas
 
+### Exemplos de Uso
+
+#### No PowerShell:
 ```powershell
-Get-Content referencias.txt | .\simula_memoria_virtual.exe 4
+# Exemplo com 4 quadros de memória
+.\main.exe 4 < arquivo1.txt
+
+# Exemplo com 3 quadros de memória
+.\main.exe 3 < arquivo2.txt
+
+# Usando Get-Content (alternativa)
+Get-Content arquivo1.txt | .\main.exe 4
 ```
 
-## Formato do arquivo de referências
+#### No CMD:
+```cmd
+# Exemplo com 4 quadros de memória
+main.exe 4 < arquivo1.txt
 
-O arquivo de referências deve conter uma referência de página por linha. Por exemplo:
+# Usando type (alternativa)
+type arquivo1.txt | main.exe 4
+```
+
+## 📄 Formato do Arquivo de Entrada
+
+O arquivo de entrada deve conter uma sequência de números inteiros separados por espaços ou quebras de linha, representando as páginas referenciadas.
+
+**Exemplo de arquivo de entrada (`arquivo1.txt`):**
+```
+1 2 3 4 1 2 5 1 2 3 4 5
+```
+
+ou
 
 ```
-7
-0
 1
 2
-0
 3
-0
 4
+1
+2
+5
+1
 2
 3
+4
+5
 ```
 
-## Saída do programa
+## 📊 Formato da Saída
 
-O programa mostra:
-1. O estado da memória após cada referência (HIT ou FAULT)
-2. Os resultados finais com o número de page faults para cada algoritmo
-3. A taxa de page faults em porcentagem
-
-### Exemplo de saída:
+O programa exibe uma linha com os resultados dos três algoritmos:
 
 ```
-Simulador de Algoritmos de Substituição de Páginas
-Número de quadros na RAM: 4
-Total de referências lidas: 20
-
-=== ALGORITMO FIFO ===
-Referências: 7 0 1 2 0 3 0 4 2 3 0 3 2 1 2 0 1 7 0 1
-Página 7 - FAULT | Memória: [7] [ ] [ ] [ ]
-Página 0 - FAULT | Memória: [7] [0] [ ] [ ]
-...
-
-=== RESULTADOS ===
-FIFO: 10 page faults (50.00% da taxa de falta)
-OPT:  8 page faults (40.00% da taxa de falta)
-LRU:  8 page faults (40.00% da taxa de falta)
+    X quadros,       Y refs, FIFO:     Z PFs, LRU:     W PFs, OPT:     V PFs
 ```
 
-## Arquivos incluídos
+Onde:
+- `X`: Número de quadros de memória utilizados
+- `Y`: Total de referências processadas
+- `Z`: Número de page faults do algoritmo FIFO
+- `W`: Número de page faults do algoritmo LRU
+- `V`: Número de page faults do algoritmo OPT
 
-- `main.c`: Código fonte do simulador
-- `referencias.txt`: Arquivo de exemplo com referências de páginas
-- `vsim-gcc.txt`: Arquivo grande com referências reais (5+ milhões de referências)
-- `teste_pequeno.txt`: Arquivo pequeno para testes rápidos
-- `README.md`: Esta documentação
-- `Makefile`: Para facilitar compilação e testes
-
-## Testes com arquivo vsim-gcc
-
-O projeto inclui um arquivo real de referências de páginas (`vsim-gcc.txt`) com mais de 5 milhões de referências. Para testes práticos, use amostras menores:
-
-### Resultados de exemplo (50 referências, diferentes números de quadros):
-
-**Com 4 quadros:**
-- FIFO: 39 page faults (78.00%)
-- OPT: 30 page faults (60.00%) 
-- LRU: 38 page faults (76.00%)
-
-**Com 8 quadros:**
-- FIFO: 33 page faults (66.00%)
-- OPT: 27 page faults (54.00%)
-- LRU: 32 page faults (64.00%)
-
-### Comandos para teste com vsim-gcc:
-
-```bash
-# Testar com primeiras 50 referências e 4 quadros
-Get-Content vsim-gcc.txt | Select-Object -First 50 | .\simula_memoria_virtual.exe 4
-
-# Testar com diferentes números de quadros
-Get-Content vsim-gcc.txt | Select-Object -First 100 | .\simula_memoria_virtual.exe 8
-Get-Content vsim-gcc.txt | Select-Object -First 100 | .\simula_memoria_virtual.exe 16
+**Exemplo de saída:**
+```
+    4 quadros,      12 refs, FIFO:     6 PFs, LRU:     7 PFs, OPT:     5 PFs
 ```
 
-## Implementação
+## 🧪 Exemplo Completo
 
-O programa implementa cada algoritmo de forma clara e educativa:
+1. **Criar arquivo de teste** (`teste.txt`):
+   ```
+   7 0 1 2 0 3 0 4 2 3 0 3 2
+   ```
 
-- **FIFO**: Utiliza um índice circular para controlar qual página remover
-- **OPT**: Analisa todas as referências futuras para encontrar a página ótima para remoção
-- **LRU**: Mantém um timestamp de último uso para cada página na memória
+2. **Compilar o programa**:
+   ```bash
+   gcc main.c -o main.exe
+   ```
 
-Cada algoritmo mostra o estado da memória após cada referência, facilitando o entendimento do comportamento de cada estratégia de substituição.
+3. **Executar com 3 quadros**:
+   ```bash
+   .\main.exe 3 < teste.txt
+   ```
+
+4. **Resultado esperado**:
+   ```
+       3 quadros,      13 refs, FIFO:     9 PFs, LRU:    10 PFs, OPT:     7 PFs
+   ```
+
+## 📈 Interpretação dos Resultados
+
+- **Page Fault (PF)**: Ocorre quando uma página referenciada não está presente na memória
+- **FIFO**: Remove a página que está há mais tempo na memória
+- **LRU**: Remove a página que foi usada há mais tempo
+- **OPT**: Remove a página que será usada mais tarde no futuro (algoritmo ótimo teórico)
+
+**Observação**: O algoritmo OPT sempre apresenta o menor número de page faults, pois conhece toda a sequência de referências futuras.
+
+## ⚠️ Limitações
+
+- Máximo de 100.000 referências por execução
+- O programa lê todas as referências antes de iniciar a simulação
+- Entrada deve ser fornecida via redirecionamento ou pipe
+
+## 🐛 Solução de Problemas
+
+### Erro: "Uso: main.exe <num_quadros>"
+- Certifique-se de fornecer exatamente um argumento (número de quadros)
+
+### Programa não executa
+- Verifique se o GCC está instalado: `gcc --version`
+- Verifique se o arquivo foi compilado corretamente
+
+### Arquivo não encontrado
+- Verifique se o arquivo de entrada existe no diretório atual
+- Use caminho absoluto se necessário: `.\main.exe 4 < C:\caminho\para\arquivo.txt`
