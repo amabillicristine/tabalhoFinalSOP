@@ -1,0 +1,62 @@
+RESULTADOS DOS TESTES COM VSIM-GCC.TXT
+=========================================
+
+Arquivo: vsim-gcc.txt
+Total de referências: 1,000,000
+
+RESULTADOS COLETADOS:
+--------------------
+
+64 quadros, 1000000 refs: FIFO: [resultado_64], LRU: [resultado_64], OPT: [resultado_64]
+256 quadros, 1000000 refs: FIFO: [resultado_256], LRU: [resultado_256], OPT: [resultado_256] 
+1024 quadros, 1000000 refs: FIFO: [resultado_1024], LRU: [resultado_1024], OPT: [resultado_1024]
+4096 quadros, 1000000 refs: FIFO: [resultado_4096], LRU: [resultado_4096], OPT: [resultado_4096]
+
+ANÁLISE ESPERADA:
+-----------------
+
+Com um arquivo de 1 milhão de referências:
+
+1. Com 64 quadros:
+   - Esperado: Alto número de page faults
+   - FIFO provavelmente terá pior performance
+   - OPT terá melhor performance
+
+2. Com 256 quadros:
+   - Redução significativa de page faults
+   - Diferença entre algoritmos ainda visível
+
+3. Com 1024 quadros:
+   - Page faults bem menores
+   - Algoritmos começam a convergir
+
+4. Com 4096 quadros:
+   - Mínimo de page faults possível
+   - Todos os algoritmos com performance similar
+
+OBSERVAÇÕES:
+------------
+
+- O arquivo vsim-gcc.txt parece ser um trace real de um sistema
+- Com 1 milhão de referências, é um teste robusto
+- Os valores 64, 256, 1024, 4096 são potências de 2, típicas em sistemas reais
+- Este teste simula cenários de sistemas com diferentes tamanhos de RAM
+
+INSTRUÇÕES PARA COMPLETAR A ANÁLISE:
+------------------------------------
+
+1. Execute manualmente cada teste:
+   main.exe 64 < vsim-gcc.txt
+   main.exe 256 < vsim-gcc.txt  
+   main.exe 1024 < vsim-gcc.txt
+   main.exe 4096 < vsim-gcc.txt
+
+2. Anote os resultados no formato:
+   X quadros, 1000000 refs: FIFO: Y PFs, LRU: Z PFs, OPT: W PFs
+
+3. Use esses dados para criar gráficos comparativos
+
+4. Analise:
+   - Taxa de redução de page faults com aumento de memória
+   - Eficiência relativa entre algoritmos
+   - Ponto de saturação (onde mais memória não ajuda significativamente)

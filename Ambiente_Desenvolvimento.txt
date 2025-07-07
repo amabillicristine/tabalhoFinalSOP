@@ -1,0 +1,602 @@
+AMBIENTE DE DESENVOLVIMENTO - ALGORITMOS DE SUBSTITUIÇÃO DE PÁGINAS
+=====================================================================
+
+1. ESPECIFICAÇÕES DO SISTEMA
+============================
+
+SISTEMA OPERACIONAL:
+- Windows (baseado na estrutura de pastas e comandos PowerShell/CMD)
+- Compatível com sistemas Unix/Linux com pequenas adaptações
+
+HARDWARE MÍNIMO RECOMENDADO:
+- Processador: Qualquer CPU x86/x64 moderna
+- RAM: 2GB (suficiente para compilação e execução)
+- Armazenamento: 50MB de espaço livre
+- Arquitetura: 32-bit ou 64-bit
+
+2. FERRAMENTAS DE DESENVOLVIMENTO
+=================================
+
+COMPILADOR:
+- GCC (GNU Compiler Collection)
+- Versão: 4.8 ou superior recomendada
+- Instalação no Windows: MinGW-w64 ou MSYS2
+- Instalação no Linux: sudo apt install gcc (Ubuntu/Debian)
+
+EDITOR DE CÓDIGO:
+- Visual Studio Code (recomendado)
+- Extensões úteis:
+  * C/C++ Extension Pack
+  * Code Runner
+  * GitLens (para controle de versão)
+
+TERMINAL:
+- Windows: PowerShell (recomendado) ou CMD
+- Linux/Mac: Bash/Zsh terminal padrão
+
+CONTROLE DE VERSÃO:
+- Git (para gerenciamento de código)
+- GitHub para repositório remoto
+
+3. ESTRUTURA DO PROJETO
+=======================
+
+ORGANIZAÇÃO DOS ARQUIVOS:
+```
+tabalhoFinalSOP/
+├── main.c                              # Código principal
+├── simula_memoria_virtual.c             # Código de referência
+├── README.md                           # Instruções de uso
+├── Algoritmos_Substituicao_Paginas.txt # Documentação técnica
+├── arquivo1.txt                        # Arquivo de teste 1
+├── arquivo2.txt                        # Arquivo de teste 2
+├── arquivo3.zip                        # Arquivo de teste 3 (compactado)
+└── vsim-gcc.txt                        # Notas sobre compilação
+```
+
+CONVENÇÕES DE NOMENCLATURA:
+- Arquivos fonte: extensão .c
+- Executáveis: main.exe (Windows) ou main (Linux)
+- Documentação: extensões .md, .txt
+- Dados de teste: arquivo1.txt, arquivo2.txt, etc.
+
+4. CONFIGURAÇÃO DO AMBIENTE
+===========================
+
+INSTALAÇÃO DO GCC NO WINDOWS:
+
+Opção 1 - MinGW-w64:
+1. Baixar de: https://www.mingw-w64.org/downloads/
+2. Instalar e adicionar ao PATH do sistema
+3. Verificar: gcc --version
+
+Opção 2 - MSYS2 (recomendado):
+1. Baixar de: https://www.msys2.org/
+2. Instalar o pacote base
+3. Executar: pacman -S mingw-w64-x86_64-gcc
+4. Adicionar C:\msys64\mingw64\bin ao PATH
+
+CONFIGURAÇÃO DO VS CODE:
+1. Instalar Visual Studio Code
+2. Instalar extensão C/C++
+3. Configurar tasks.json para compilação automática
+4. Configurar launch.json para debug (opcional)
+
+VERIFICAÇÃO DA INSTALAÇÃO:
+```bash
+# Verificar GCC
+gcc --version
+
+# Teste rápido
+echo 'int main(){return 0;}' > teste.c
+gcc teste.c -o teste
+./teste.exe
+echo $?  # Deve retornar 0
+```
+
+5. PROCESSO DE DESENVOLVIMENTO
+==============================
+
+FLUXO DE TRABALHO:
+1. Análise dos requisitos
+2. Planejamento da estrutura do código
+3. Implementação dos algoritmos
+4. Testes unitários (manual)
+5. Testes com arquivos de entrada
+6. Documentação
+7. Versionamento com Git
+
+METODOLOGIA DE TESTES:
+- Testes manuais com entrada conhecida
+- Verificação da conformidade com especificação
+- Comparação com resultado esperado
+- Testes de performance com arquivos grandes
+
+CONTROLE DE QUALIDADE:
+- Código limpo e comentado
+- Seguir padrões C ANSI
+- Verificação de memory leaks (não aplicável aqui - arrays estáticos)
+- Validação da saída conforme especificação
+
+6. COMPILAÇÃO E EXECUÇÃO
+========================
+
+COMANDOS DE COMPILAÇÃO:
+
+Compilação básica:
+```bash
+gcc main.c -o main
+```
+
+Compilação com debug:
+```bash
+gcc -g -Wall main.c -o main_debug
+```
+
+Compilação otimizada:
+```bash
+gcc -O2 main.c -o main_optimized
+```
+
+Compilação com warnings extras:
+```bash
+gcc -Wall -Wextra -pedantic main.c -o main
+```
+
+EXECUÇÃO:
+```bash
+# Windows PowerShell
+.\main.exe 4 < arquivo1.txt
+
+# Windows CMD
+main.exe 4 < arquivo1.txt
+
+# Linux/Mac
+./main 4 < arquivo1.txt
+```
+
+7. DEPENDÊNCIAS E BIBLIOTECAS
+=============================
+
+BIBLIOTECAS PADRÃO UTILIZADAS:
+- stdio.h: Entrada/saída padrão (printf, scanf)
+- stdlib.h: Funções utilitárias (atoi, malloc se necessário)
+
+NENHUMA DEPENDÊNCIA EXTERNA:
+- Código usa apenas bibliotecas padrão C
+- Não requer instalação de pacotes adicionais
+- Compatível com qualquer compilador C padrão
+
+CARACTERÍSTICAS DO CÓDIGO:
+- C ANSI compatível
+- Arrays de tamanho variável (VLA) - C99 feature
+- Sem uso de malloc/free (arrays automáticos)
+
+8. CONFIGURAÇÕES ESPECÍFICAS
+============================
+
+CONFIGURAÇÃO DO VS CODE (tasks.json):
+```json
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Compilar C",
+            "type": "shell",
+            "command": "gcc",
+            "args": [
+                "main.c",
+                "-o",
+                "main.exe",
+                "-Wall"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}
+```
+
+CONFIGURAÇÃO DE DEBUG (launch.json):
+```json
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug C",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/main.exe",
+            "args": ["4"],
+            "console": "integratedTerminal"
+        }
+    ]
+}
+```
+
+9. PADRÕES DE CÓDIGO UTILIZADOS
+===============================
+
+ESTILO DE CODIFICAÇÃO:
+- Indentação: 4 espaços
+- Chaves: estilo K&R
+- Nomes de variáveis: snake_case
+- Nomes de funções: simula_algoritmo
+- Constantes: UPPER_CASE
+
+COMENTÁRIOS:
+- Comentários de linha para explicações breves
+- Comentários de bloco para funções complexas
+- Documentação inline para partes críticas
+
+ORGANIZAÇÃO:
+- Includes no topo
+- Defines após includes
+- Funções em ordem lógica
+- main() no final
+
+10. VERSIONAMENTO E BACKUP
+==========================
+
+CONTROLE DE VERSÃO:
+```bash
+# Inicialização do repositório
+git init
+git add .
+git commit -m "Implementação inicial dos algoritmos"
+
+# Versionamento das mudanças
+git add main.c
+git commit -m "Correção no formato de saída"
+git push origin main
+```
+
+BACKUP DOS ARQUIVOS:
+- Repositório Git local
+- Repositório remoto (GitHub)
+- Backup manual dos arquivos de teste
+
+11. TESTING E VALIDAÇÃO
+=======================
+
+ESTRATÉGIA DE TESTES:
+1. Testes unitários (por algoritmo)
+2. Testes de integração (programa completo)
+3. Testes de aceitação (conformidade com especificação)
+4. Testes de stress (arquivos grandes)
+
+CASOS DE TESTE:
+- Entrada pequena (< 20 referências)
+- Entrada média (100-1000 referências)
+- Entrada grande (> 10000 referências)
+- Casos extremos (1 quadro, muitos quadros)
+
+VALIDAÇÃO:
+- Comparação manual para casos pequenos
+- Verificação da consistência OPT ≤ LRU ≤ FIFO
+- Teste com diferentes números de quadros
+
+12. PERFORMANCE E OTIMIZAÇÃO
+===========================
+
+COMPLEXIDADE TEMPORAL:
+- FIFO: O(n) onde n = número de referências
+- LRU: O(n * f) onde f = número de quadros  
+- OPT: O(n² * f) - mais complexo devido à busca futura
+
+OTIMIZAÇÕES IMPLEMENTADAS:
+- Arrays estáticos para evitar malloc/free
+- Break precoce nas buscas
+- Uso de int ao invés de tipos maiores
+
+LIMITAÇÕES:
+- MAX_REFS = 100000 (configurável)
+- Uso de arrays VLA (pode ser limitado em alguns sistemas)
+
+13. TROUBLESHOOTING
+===================
+
+PROBLEMAS COMUNS:
+
+Erro de compilação - "variable length array":
+- Solução: usar gcc com -std=c99 ou superior
+
+Erro "command not found":
+- Verificar se gcc está no PATH
+- Reinstalar MinGW/MSYS2
+
+Saída incorreta:
+- Verificar formato da string printf
+- Conferir ordem dos algoritmos na saída
+
+Performance lenta:
+- Verificar tamanho do arquivo de entrada
+- Considerar otimizações de compilação (-O2)
+
+14. VISUALIZAÇÃO DE RESULTADOS - GRÁFICOS
+==========================================
+
+FERRAMENTAS PARA CRIAR GRÁFICOS:
+
+OPÇÃO 1 - PYTHON + MATPLOTLIB (Recomendado):
+```python
+import matplotlib.pyplot as plt
+import subprocess
+
+# Script para gerar dados
+def executar_teste(quadros, arquivo):
+    cmd = f"main.exe {quadros} < {arquivo}"
+    resultado = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+    return resultado.stdout
+
+# Exemplo de gráfico
+quadros = [1, 2, 3, 4, 5, 6, 7]
+fifo_pfs = []
+lru_pfs = []
+opt_pfs = []
+
+for q in quadros:
+    saida = executar_teste(q, "arquivo1.txt")
+    # Parsear resultado: "4 quadros, 30 refs: FIFO: 17 PFs, LRU: 15 PFs, OPT: 11 PFs"
+    valores = extrair_valores(saida)
+    fifo_pfs.append(valores['fifo'])
+    lru_pfs.append(valores['lru'])
+    opt_pfs.append(valores['opt'])
+
+plt.figure(figsize=(10, 6))
+plt.plot(quadros, fifo_pfs, 'o-', label='FIFO', linewidth=2)
+plt.plot(quadros, lru_pfs, 's-', label='LRU', linewidth=2)
+plt.plot(quadros, opt_pfs, '^-', label='OPT', linewidth=2)
+plt.xlabel('Número de Quadros')
+plt.ylabel('Page Faults')
+plt.title('Comparação de Algoritmos de Substituição de Páginas')
+plt.legend()
+plt.grid(True)
+plt.savefig('resultados.png', dpi=300, bbox_inches='tight')
+plt.show()
+```
+
+OPÇÃO 2 - EXCEL/GOOGLE SHEETS:
+1. Executar testes manualmente
+2. Anotar resultados em planilha:
+   | Quadros | FIFO | LRU | OPT |
+   |---------|------|-----|-----|
+   | 1       | 30   | 30  | 30  |
+   | 2       | 20   | 18  | 15  |
+   | 3       | 15   | 12  | 10  |
+3. Criar gráfico de linhas
+4. Personalizar cores e labels
+
+OPÇÃO 3 - GNUPLOT:
+```gnuplot
+set terminal png size 800,600
+set output 'grafico.png'
+set title "Algoritmos de Substituição de Páginas"
+set xlabel "Número de Quadros"
+set ylabel "Page Faults"
+set grid
+plot "dados.txt" using 1:2 with linespoints title "FIFO", \
+     "dados.txt" using 1:3 with linespoints title "LRU", \
+     "dados.txt" using 1:4 with linespoints title "OPT"
+```
+
+SCRIPT AUTOMATIZADO PARA COLETA DE DADOS:
+
+Arquivo: gerar_dados.bat (Windows)
+```batch
+@echo off
+echo Quadros,FIFO,LRU,OPT > resultados.csv
+for %%i in (1 2 3 4 5 6 7) do (
+    main.exe %%i < arquivo1.txt >> temp.txt
+    rem Processar saída e adicionar ao CSV
+)
+```
+
+Arquivo: gerar_dados.py (Python completo)
+```python
+import subprocess
+import re
+import matplotlib.pyplot as plt
+import pandas as pd
+
+def extrair_dados(saida):
+    """Extrai valores da saída do programa"""
+    padrao = r'(\d+) quadros,\s+(\d+) refs: FIFO:\s+(\d+) PFs, LRU:\s+(\d+) PFs, OPT:\s+(\d+) PFs'
+    match = re.search(padrao, saida)
+    if match:
+        return {
+            'quadros': int(match.group(1)),
+            'refs': int(match.group(2)),
+            'fifo': int(match.group(3)),
+            'lru': int(match.group(4)),
+            'opt': int(match.group(5))
+        }
+    return None
+
+def executar_testes(arquivo_entrada, max_quadros=7):
+    """Executa testes para diferentes números de quadros"""
+    resultados = []
+    
+    for quadros in range(1, max_quadros + 1):
+        cmd = f"main.exe {quadros}"
+        try:
+            with open(arquivo_entrada, 'r') as f:
+                processo = subprocess.run(cmd, shell=True, input=f.read(), 
+                                        capture_output=True, text=True)
+            
+            if processo.returncode == 0:
+                dados = extrair_dados(processo.stdout)
+                if dados:
+                    resultados.append(dados)
+                    print(f"✓ {quadros} quadros: FIFO={dados['fifo']}, LRU={dados['lru']}, OPT={dados['opt']}")
+            else:
+                print(f"✗ Erro ao executar com {quadros} quadros")
+                
+        except Exception as e:
+            print(f"✗ Erro: {e}")
+    
+    return resultados
+
+def criar_graficos(resultados, titulo="Algoritmos de Substituição"):
+    """Cria múltiplos gráficos dos resultados"""
+    df = pd.DataFrame(resultados)
+    
+    # Gráfico 1: Linhas comparativas
+    plt.figure(figsize=(12, 8))
+    
+    plt.subplot(2, 2, 1)
+    plt.plot(df['quadros'], df['fifo'], 'o-', label='FIFO', color='red', linewidth=2)
+    plt.plot(df['quadros'], df['lru'], 's-', label='LRU', color='blue', linewidth=2)
+    plt.plot(df['quadros'], df['opt'], '^-', label='OPT', color='green', linewidth=2)
+    plt.xlabel('Número de Quadros')
+    plt.ylabel('Page Faults')
+    plt.title(f'{titulo} - Comparação')
+    plt.legend()
+    plt.grid(True, alpha=0.3)
+    
+    # Gráfico 2: Barras agrupadas
+    plt.subplot(2, 2, 2)
+    x = df['quadros']
+    width = 0.25
+    plt.bar(x - width, df['fifo'], width, label='FIFO', color='red', alpha=0.7)
+    plt.bar(x, df['lru'], width, label='LRU', color='blue', alpha=0.7)
+    plt.bar(x + width, df['opt'], width, label='OPT', color='green', alpha=0.7)
+    plt.xlabel('Número de Quadros')
+    plt.ylabel('Page Faults')
+    plt.title('Comparação em Barras')
+    plt.legend()
+    
+    # Gráfico 3: Redução percentual
+    plt.subplot(2, 2, 3)
+    reducao_lru = ((df['fifo'] - df['lru']) / df['fifo'] * 100)
+    reducao_opt = ((df['fifo'] - df['opt']) / df['fifo'] * 100)
+    plt.plot(df['quadros'], reducao_lru, 'o-', label='LRU vs FIFO', linewidth=2)
+    plt.plot(df['quadros'], reducao_opt, 's-', label='OPT vs FIFO', linewidth=2)
+    plt.xlabel('Número de Quadros')
+    plt.ylabel('Redução (%)')
+    plt.title('Melhoria Percentual')
+    plt.legend()
+    plt.grid(True, alpha=0.3)
+    
+    # Gráfico 4: Eficiência relativa ao ótimo
+    plt.subplot(2, 2, 4)
+    efic_fifo = (df['opt'] / df['fifo'] * 100)
+    efic_lru = (df['opt'] / df['lru'] * 100)
+    plt.plot(df['quadros'], efic_fifo, 'o-', label='FIFO', linewidth=2)
+    plt.plot(df['quadros'], efic_lru, 's-', label='LRU', linewidth=2)
+    plt.axhline(y=100, color='green', linestyle='--', label='OPT (100%)')
+    plt.xlabel('Número de Quadros')
+    plt.ylabel('Eficiência (%)')
+    plt.title('Eficiência Relativa ao Ótimo')
+    plt.legend()
+    plt.grid(True, alpha=0.3)
+    
+    plt.tight_layout()
+    plt.savefig(f'{titulo.lower().replace(" ", "_")}_analise.png', dpi=300, bbox_inches='tight')
+    plt.show()
+    
+    return df
+
+def salvar_relatorio(df, arquivo="relatorio_resultados.txt"):
+    """Salva relatório textual dos resultados"""
+    with open(arquivo, 'w') as f:
+        f.write("RELATÓRIO DE ANÁLISE - ALGORITMOS DE SUBSTITUIÇÃO DE PÁGINAS\n")
+        f.write("=" * 60 + "\n\n")
+        
+        f.write("DADOS COLETADOS:\n")
+        f.write(df.to_string(index=False))
+        f.write("\n\n")
+        
+        f.write("ANÁLISE ESTATÍSTICA:\n")
+        f.write(f"Média FIFO: {df['fifo'].mean():.2f}\n")
+        f.write(f"Média LRU:  {df['lru'].mean():.2f}\n")
+        f.write(f"Média OPT:  {df['opt'].mean():.2f}\n\n")
+        
+        melhoria_lru = ((df['fifo'] - df['lru']) / df['fifo'] * 100).mean()
+        melhoria_opt = ((df['fifo'] - df['opt']) / df['fifo'] * 100).mean()
+        f.write(f"Melhoria média LRU vs FIFO: {melhoria_lru:.1f}%\n")
+        f.write(f"Melhoria média OPT vs FIFO: {melhoria_opt:.1f}%\n")
+
+# EXEMPLO DE USO COMPLETO
+if __name__ == "__main__":
+    print("Iniciando coleta de dados...")
+    
+    # Teste com arquivo1.txt
+    resultados1 = executar_testes("arquivo1.txt")
+    if resultados1:
+        df1 = criar_graficos(resultados1, "Arquivo 1")
+        salvar_relatorio(df1, "relatorio_arquivo1.txt")
+    
+    # Teste com arquivo2.txt
+    resultados2 = executar_testes("arquivo2.txt")
+    if resultados2:
+        df2 = criar_graficos(resultados2, "Arquivo 2")
+        salvar_relatorio(df2, "relatorio_arquivo2.txt")
+    
+    print("Análise completa! Verifique os arquivos gerados.")
+```
+
+INSTALAÇÃO DAS DEPENDÊNCIAS PYTHON:
+```bash
+pip install matplotlib pandas numpy
+```
+
+TIPOS DE GRÁFICOS RECOMENDADOS:
+
+1. GRÁFICO DE LINHAS:
+   - Mostra tendência com aumento de quadros
+   - Melhor para comparar algoritmos
+
+2. GRÁFICO DE BARRAS:
+   - Compara valores absolutos
+   - Bom para apresentações
+
+3. GRÁFICO DE DISPERSÃO:
+   - Mostra correlação
+   - Útil para análise estatística
+
+4. GRÁFICO DE ÁREA:
+   - Mostra proporção entre algoritmos
+   - Visual impactante
+
+INTERPRETAÇÃO DOS GRÁFICOS:
+
+PADRÕES ESPERADOS:
+- Page faults diminuem com mais quadros
+- OPT ≤ LRU ≤ FIFO (sempre)
+- Curva em formato de hipérbole
+
+ANOMALIAS POSSÍVEIS:
+- Anomalia de Belady (FIFO pode piorar com mais memória)
+- Platôs (quando memória suficiente para todas as páginas)
+
+MÉTRICAS DE ANÁLISE:
+- Taxa de redução de page faults
+- Eficiência relativa ao ótimo
+- Ponto de saturação (onde mais memória não ajuda)
+
+15. CONCLUSÃO
+=============
+
+AMBIENTE COMPLETO PARA:
+✓ Desenvolvimento em C moderno
+✓ Compilação multiplataforma  
+✓ Testes automatizados
+✓ Documentação técnica
+✓ Controle de versão
+✓ Debugging quando necessário
+✓ Visualização e análise de resultados
+
+CARACTERÍSTICAS:
+- Simples de configurar
+- Ferramentas gratuitas
+- Multiplataforma
+- Padrões da indústria
+- Escalável para projetos maiores
+- Análise visual completa
+
+Este ambiente proporciona uma base sólida para desenvolvimento, teste, 
+análise e apresentação dos resultados do simulador de algoritmos de 
+substituição de páginas.

@@ -1,0 +1,42 @@
+======================================================================
+RELATÓRIO DE ANÁLISE: ARQUIVO: ARQUIVO1.TXT
+======================================================================
+
+DADOS COLETADOS:
+--------------------------------------------------
+Quadros  FIFO   LRU    OPT    Melhoria LRU Melhoria OPT
+--------------------------------------------------
+1        20     20     20     0.0         % 0.0         %
+2        17     17     15     0.0         % 11.8        %
+3        15     14     11     6.7         % 26.7        %
+4        12     11     9      8.3         % 25.0        %
+5        10     9      8      10.0        % 20.0        %
+6        8      8      8      0.0         % 0.0         %
+7        8      8      8      0.0         % 0.0         %
+
+==================================================
+ESTATÍSTICAS RESUMO:
+==================================================
+Total de referências: 24
+Quadros testados: 1 a 7
+
+MÉDIAS:
+  FIFO: 12.9 page faults
+  LRU:  12.4 page faults
+  OPT:  11.3 page faults
+
+MELHORIAS MÉDIAS:
+  LRU vs FIFO: 3.6%
+  OPT vs FIFO: 11.9%
+  LRU vs OPT:  8.9%
+
+EFICIÊNCIA RELATIVA AO ÓTIMO:
+  FIFO: 88.1%
+  LRU:  91.1%
+  OPT:  100.0%
+
+OBSERVAÇÕES:
+- Valores menores de page faults indicam melhor performance
+- OPT é sempre ótimo (menor número possível de page faults)
+- LRU geralmente supera FIFO em cenários práticos
+- A diferença diminui com o aumento do número de quadros

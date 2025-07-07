@@ -1,0 +1,39 @@
+======================================================================
+RELATÓRIO DE ANÁLISE: ARQUIVO GRANDE: VSIM-GCC.TXT (100,000 REFERÊNCIAS)
+======================================================================
+
+DADOS COLETADOS:
+--------------------------------------------------
+Quadros  FIFO   LRU    OPT    Melhoria LRU Melhoria OPT
+--------------------------------------------------
+64       3219   2535   1629   21.2        % 49.4        %
+256      1172   986    695    15.9        % 40.7        %
+1024     684    684    684    0.0         % 0.0         %
+4096     684    684    684    0.0         % 0.0         %
+
+==================================================
+ESTATÍSTICAS RESUMO:
+==================================================
+Total de referências: 100000
+Quadros testados: 64 a 4096
+
+MÉDIAS:
+  FIFO: 1439.8 page faults
+  LRU:  1222.2 page faults
+  OPT:  923.0 page faults
+
+MELHORIAS MÉDIAS:
+  LRU vs FIFO: 9.3%
+  OPT vs FIFO: 22.5%
+  LRU vs OPT:  16.3%
+
+EFICIÊNCIA RELATIVA AO ÓTIMO:
+  FIFO: 77.5%
+  LRU:  83.7%
+  OPT:  100.0%
+
+OBSERVAÇÕES:
+- Valores menores de page faults indicam melhor performance
+- OPT é sempre ótimo (menor número possível de page faults)
+- LRU geralmente supera FIFO em cenários práticos
+- A diferença diminui com o aumento do número de quadros
