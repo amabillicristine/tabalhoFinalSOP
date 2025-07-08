@@ -1,149 +1,162 @@
-# Simulador de Algoritmos de Substituição de Páginas
+# Simulador de Memória Virtual
 
-Este programa simula três algoritmos clássicos de substituição de páginas em sistemas de memória virtual:
-- **FIFO** (First In, First Out)
-- **LRU** (Least Recently Used)
-- **OPT** (Optimal/Ótimo)
+Simulador dos algoritmos de substituição de páginas: FIFO, LRU e OPT.
 
-## 📋 Pré-requisitos
+## Estrutura do Projeto
 
-- Compilador GCC instalado no sistema
-- Sistema operacional Windows (CMD ou PowerShell)
-
-## 🔨 Compilação
-
-Para compilar o programa, execute o seguinte comando no terminal:
-
-```bash
-gcc main.c -o main.exe
+```
+📁 tabalhoFinalSOP/
+├── 📄 main.c                    # Código principal do simulador
+├── 📄 Makefile                  # Automação de compilação e testes
+├── 📄 README.md                 # Este arquivo
+├── 📄 arquivo1.txt              # Arquivo de teste 1 (24 referências)
+├── 📄 arquivo2.txt              # Arquivo de teste 2 (30 referências)
+├── 📄 vsim-gcc.txt              # Arquivo de teste grande (1M+ referências)
+└── 📁 relatorios/               # Pasta com relatórios e análises
+    ├── 📄 *.png                 # Gráficos de análise
+    ├── 📄 *.csv                 # Dados de performance
+    ├── 📄 *.txt                 # Relatórios de teste
+    ├── 📄 *.md                  # Documentação adicional
+    ├── 📄 *.bat, *.ps1          # Scripts auxiliares
+    └── 📁 scripts/              # Scripts Python para análise
+        ├── 📄 simulador.py      # Simulador em Python
+        ├── 📄 gerar_graficos.py # Geração de gráficos
+        └── 📄 teste_rapido.py   # Testes automatizados
 ```
 
-## 🚀 Execução
+## Como usar
 
-### Sintaxe
-```bash
-main.exe <numero_de_quadros> < arquivo_de_referencias
-```
+### Pré-requisitos
+- GCC (MinGW no Windows) instalado e configurado no PATH
+- Para Windows: instale MinGW-w64 ou use o compilador via MSYS2
 
-Onde:
-- `<numero_de_quadros>`: Número de quadros de página disponíveis na memória
-- `<arquivo_de_referencias>`: Arquivo contendo a sequência de referências às páginas
+### Compilação
 
-### Exemplos de Uso
-
-#### No PowerShell:
-```powershell
-# Exemplo com 4 quadros de memória
-.\main.exe 4 < arquivo1.txt
-
-# Exemplo com 3 quadros de memória
-.\main.exe 3 < arquivo2.txt
-
-# Usando Get-Content (alternativa)
-Get-Content arquivo1.txt | .\main.exe 4
-```
-
-#### No CMD:
+#### Windows (CMD/PowerShell)
 ```cmd
-# Exemplo com 4 quadros de memória
-main.exe 4 < arquivo1.txt
-
-# Usando type (alternativa)
-type arquivo1.txt | main.exe 4
+gcc -Wall -Wextra -std=c99 main.c -o simulador.exe
 ```
 
-## 📄 Formato do Arquivo de Entrada
-
-O arquivo de entrada deve conter uma sequência de números inteiros separados por espaços ou quebras de linha, representando as páginas referenciadas.
-
-**Exemplo de arquivo de entrada (`arquivo1.txt`):**
-```
-1 2 3 4 1 2 5 1 2 3 4 5
+#### Linux/Mac
+```bash
+gcc -Wall -Wextra -std=c99 main.c -o simulador
 ```
 
-ou
+### Execução com arquivos de teste
 
-```
-1
-2
-3
-4
-1
-2
-5
-1
-2
-3
-4
-5
+#### Windows CMD
+```cmd
+# Testar com arquivo1.txt usando 3 frames
+type arquivo1.txt | simulador.exe 3
+
+# Testar com arquivo2.txt usando 4 frames  
+type arquivo2.txt | simulador.exe 4
+
+# Testar com vsim-gcc.txt (primeiras 100 linhas) usando 8 frames
+powershell "Get-Content vsim-gcc.txt | Select-Object -First 100" | simulador.exe 8
 ```
 
-## 📊 Formato da Saída
+#### Windows PowerShell
+```powershell
+# Testar com arquivo1.txt
+Get-Content arquivo1.txt | .\simulador.exe 3
 
-O programa exibe uma linha com os resultados dos três algoritmos:
+# Testar com arquivo2.txt
+Get-Content arquivo2.txt | .\simulador.exe 4
 
-```
-    X quadros,       Y refs, FIFO:     Z PFs, LRU:     W PFs, OPT:     V PFs
-```
-
-Onde:
-- `X`: Número de quadros de memória utilizados
-- `Y`: Total de referências processadas
-- `Z`: Número de page faults do algoritmo FIFO
-- `W`: Número de page faults do algoritmo LRU
-- `V`: Número de page faults do algoritmo OPT
-
-**Exemplo de saída:**
-```
-    4 quadros,      12 refs, FIFO:     6 PFs, LRU:     7 PFs, OPT:     5 PFs
+# Testar com vsim-gcc.txt (primeiras 1000 linhas)
+Get-Content vsim-gcc.txt | Select-Object -First 1000 | .\simulador.exe 16
 ```
 
-## 🧪 Exemplo Completo
+#### Linux/Mac
+```bash
+./simulador 3 < arquivo1.txt
+./simulador 4 < arquivo2.txt
+head -1000 vsim-gcc.txt | ./simulador 16
+```
 
-1. **Criar arquivo de teste** (`teste.txt`):
-   ```
-   7 0 1 2 0 3 0 4 2 3 0 3 2
-   ```
+### Execução manual
+```bash
+# Windows
+.\simulador.exe 3
 
-2. **Compilar o programa**:
-   ```bash
-   gcc main.c -o main.exe
-   ```
+# Linux/Mac
+./simulador 3
+```
+Digite as referências de páginas uma por linha e pressione Ctrl+Z (Windows) ou Ctrl+D (Linux) para finalizar.
 
-3. **Executar com 3 quadros**:
-   ```bash
-   .\main.exe 3 < teste.txt
-   ```
+### Comando completo (compilar, executar e limpar)
 
-4. **Resultado esperado**:
-   ```
-       3 quadros,      13 refs, FIFO:     9 PFs, LRU:    10 PFs, OPT:     7 PFs
-   ```
+#### Windows CMD
+```cmd
+gcc -Wall -Wextra -std=c99 main.c -o temp.exe && type arquivo1.txt | temp.exe 3 && del temp.exe
+```
 
-## 📈 Interpretação dos Resultados
+#### Windows PowerShell
+```powershell
+gcc -Wall -Wextra -std=c99 main.c -o temp.exe; if ($?) { Get-Content arquivo1.txt | .\temp.exe 3; Remove-Item temp.exe }
+```
 
-- **Page Fault (PF)**: Ocorre quando uma página referenciada não está presente na memória
-- **FIFO**: Remove a página que está há mais tempo na memória
-- **LRU**: Remove a página que foi usada há mais tempo
-- **OPT**: Remove a página que será usada mais tarde no futuro (algoritmo ótimo teórico)
+## Exemplos de uso
 
-**Observação**: O algoritmo OPT sempre apresenta o menor número de page faults, pois conhece toda a sequência de referências futuras.
+### Teste básico com arquivo1.txt
+```cmd
+gcc -Wall -Wextra -std=c99 main.c -o simulador.exe
+type arquivo1.txt | simulador.exe 3
+```
+**Saída esperada:**
+```
+    3 quadros,      24 refs, FIFO:    15 PFs, LRU:    14 PFs, OPT:    11 PFs
+```
 
-## ⚠️ Limitações
+### Teste com arquivo2.txt
+```cmd
+type arquivo2.txt | simulador.exe 4
+```
+**Saída esperada:**
+```
+    4 quadros,      30 refs, FIFO:    10 PFs, LRU:     8 PFs, OPT:     7 PFs
+```
 
-- Máximo de 100.000 referências por execução
-- O programa lê todas as referências antes de iniciar a simulação
-- Entrada deve ser fornecida via redirecionamento ou pipe
+### Teste de performance com vsim-gcc.txt
+```cmd
+powershell "Get-Content vsim-gcc.txt | Select-Object -First 1000" | simulador.exe 64
+```
 
-## 🐛 Solução de Problemas
+### Comparação de diferentes números de frames
+```cmd
+# 2 frames
+type arquivo1.txt | simulador.exe 2
 
-### Erro: "Uso: main.exe <num_quadros>"
-- Certifique-se de fornecer exatamente um argumento (número de quadros)
+# 3 frames  
+type arquivo1.txt | simulador.exe 3
 
-### Programa não executa
-- Verifique se o GCC está instalado: `gcc --version`
-- Verifique se o arquivo foi compilado corretamente
+# 4 frames
+type arquivo1.txt | simulador.exe 4
+```
 
-### Arquivo não encontrado
-- Verifique se o arquivo de entrada existe no diretório atual
-- Use caminho absoluto se necessário: `.\main.exe 4 < C:\caminho\para\arquivo.txt`
+## Makefile (opcional)
+
+Para facilitar os testes, você pode usar os comandos do Makefile:
+
+```cmd
+# Compilar e executar sem deixar arquivos
+make run-arquivo1
+
+# Testes com diferentes frames
+make test-arquivo1-frames
+
+# Testes com arquivo2
+make test-arquivo2
+
+# Teste de performance com vsim-gcc
+make test-vsim-performance
+```
+
+## Notas importantes
+
+- O programa lê as referências de páginas da entrada padrão
+- Use números de frames apropriados para cada teste (geralmente 2-16)
+- Para arquivos grandes como vsim-gcc.txt, use amostras menores para testes rápidos
+- O algoritmo OPT sempre terá o menor número de page faults (é o algoritmo ótimo)
+- FIFO e LRU podem variar dependendo do padrão de acesso às páginas

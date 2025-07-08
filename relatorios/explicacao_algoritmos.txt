@@ -1,0 +1,133 @@
+# Explicação dos Algoritmos de Substituição de Páginas
+
+## Visão Geral
+Este programa simula três algoritmos de substituição de páginas em memória virtual: FIFO, LRU e OPT. Cada algoritmo decide qual página remover da memória quando um page fault ocorre e não há espaço livre.
+
+---
+
+## 1. Algoritmo FIFO (First In, First Out)
+
+### Como funciona:
+- **Princípio**: Remove sempre a página que chegou primeiro na memória (mais antiga)
+- **Analogia**: Como uma fila de banco - quem chegou primeiro, sai primeiro
+
+### Função `simula_fifo()`:
+1. **Inicialização**: Marca todas as posições da memória como vazias (-1)
+2. **Para cada referência de página**:
+   - Verifica se a página já está na memória
+   - Se SIM: não faz nada (hit)
+   - Se NÃO: coloca a página na próxima posição livre ou substitui a mais antiga
+3. **Controle**: Usa uma variável `pos` que funciona como um ponteiro circular
+
+### Exemplo prático:
+```
+Memória: 3 quadros
+Referências: 0, 1, 2, 3, 0
+
+Passo 1: [0, -, -] → Page fault (coloca 0)
+Passo 2: [0, 1, -] → Page fault (coloca 1)
+Passo 3: [0, 1, 2] → Page fault (coloca 2)
+Passo 4: [3, 1, 2] → Page fault (remove 0, coloca 3)
+Passo 5: [3, 1, 2] → Hit (0 não está, mas seria page fault)
+```
+
+---
+
+## 2. Algoritmo LRU (Least Recently Used)
+
+### Como funciona:
+- **Princípio**: Remove a página que não foi usada há mais tempo
+- **Analogia**: Como organizar livros - o que você não leu há mais tempo vai para o fundo
+
+### Função `simula_lru()`:
+1. **Inicialização**: Marca memória vazia e tempos de uso como -1
+2. **Para cada referência**:
+   - Se página está na memória: atualiza tempo de uso
+   - Se não está: encontra a página com menor tempo de uso e substitui
+3. **Controle**: Array `ultima_vez[]` guarda quando cada página foi usada
+
+### Exemplo prático:
+```
+Memória: 3 quadros
+Referências: 0, 1, 2, 0, 3
+
+Passo 1: [0, -, -] tempo=[0, -, -] → Page fault
+Passo 2: [0, 1, -] tempo=[0, 1, -] → Page fault
+Passo 3: [0, 1, 2] tempo=[0, 1, 2] → Page fault
+Passo 4: [0, 1, 2] tempo=[3, 1, 2] → Hit (atualiza tempo de 0)
+Passo 5: [0, 3, 2] tempo=[3, 4, 2] → Page fault (remove 1, menos usado)
+```
+
+---
+
+## 3. Algoritmo OPT (Ótimo)
+
+### Como funciona:
+- **Princípio**: Remove a página que será usada mais tarde no futuro (ou nunca mais)
+- **Analogia**: Como um vidente que sabe o futuro - remove o que não precisará tão cedo
+
+### Função `simula_opt()`:
+1. **Inicialização**: Marca memória como vazia
+2. **Para cada referência**:
+   - Se página está na memória: não faz nada
+   - Se não está: olha para o futuro e encontra qual página será usada mais tarde
+3. **Controle**: Para cada página na memória, procura sua próxima ocorrência nas referências futuras
+
+### Exemplo prático:
+```
+Memória: 3 quadros
+Referências: 0, 1, 2, 0, 3
+             ↑ posição atual
+
+Passo 4: [0, 1, 2] → Referência 3 chegou
+- Página 0: próxima em posição 3 (distância = 3)
+- Página 1: nunca mais aparece (distância = ∞)
+- Página 2: nunca mais aparece (distância = ∞)
+- Remove página 1 (ou 2, ambas nunca mais aparecem)
+```
+
+---
+
+## Função Principal `main()`
+
+### O que faz:
+1. **Validação**: Verifica se foi passado o número de quadros como parâmetro
+2. **Leitura**: Lê todas as referências da entrada padrão
+3. **Simulação**: Executa os três algoritmos com os mesmos dados
+4. **Resultado**: Mostra quantos page faults cada algoritmo gerou
+
+### Formato da saída:
+```
+    3 quadros,      24 refs, FIFO:    15 PFs, LRU:    14 PFs, OPT:    11 PFs
+```
+
+---
+
+## Conceitos Importantes
+
+### Page Fault:
+- Acontece quando o programa tenta acessar uma página que não está na memória
+- É o evento que conta para medir a eficiência do algoritmo
+
+### Eficiência dos Algoritmos:
+1. **OPT**: Sempre o melhor (impossível na prática, pois precisa conhecer o futuro)
+2. **LRU**: Geralmente bom, usa informação do passado
+3. **FIFO**: Mais simples, mas pode ter anomalias
+
+### Por que simular?
+- Permite comparar diferentes estratégias
+- Ajuda a entender o comportamento da memória virtual
+- Útil para escolher o melhor algoritmo para cada situação
+
+---
+
+## Como explicar para outra pessoa:
+
+1. **Comece com a analogia**: "Imagine que você tem uma mesa pequena e muitos livros..."
+2. **Explique o problema**: "Quando a mesa está cheia e você precisa de um novo livro, qual você remove?"
+3. **Mostre cada estratégia**:
+   - FIFO: "Remove o que está há mais tempo na mesa"
+   - LRU: "Remove o que você não usa há mais tempo"
+   - OPT: "Remove o que você vai precisar mais tarde (se soubesse o futuro)"
+4. **Execute um exemplo**: Use 3-4 referências simples e trace passo a passo
+5. **Compare resultados**: Mostre que OPT é sempre melhor, mas impossível na prática

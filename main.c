@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
 
-#define MAX_REFS 100000
+#define MAX_REFS 1000000
 
 // FIFO
 int simula_fifo(int frames, int* refs, int n_refs) {
@@ -124,11 +125,17 @@ int simula_opt(int frames, int* refs, int n_refs) {
 
 int main(int argc, char* argv[]) {
     if (argc != 2) {
+        fprintf(stderr, "Uso: %s <num_quadros>\n", argv[0]);
         return 1;
     }
 
     int num_quadros = atoi(argv[1]);
-    int referencias[MAX_REFS];
+    int* referencias = malloc(MAX_REFS * sizeof(int));
+    if (referencias == NULL) {
+        fprintf(stderr, "Erro: não foi possível alocar memória\n");
+        return 1;
+    }
+    
     int total_refs = 0;
     int valor;
 
@@ -140,8 +147,10 @@ int main(int argc, char* argv[]) {
     int pf_lru  = simula_lru(num_quadros, referencias, total_refs);
     int pf_opt  = simula_opt(num_quadros, referencias, total_refs);
 
-    printf("%5d quadros, %7d refs: FIFO: %5d PFs, LRU: %5d PFs, OPT: %5d PFs\n",
+    printf("%5d quadros, %7d refs, FIFO: %5d PFs, LRU: %5d PFs, OPT: %5d PFs\n",
            num_quadros, total_refs, pf_fifo, pf_lru, pf_opt);
+    fflush(stdout);
 
+    free(referencias);
     return 0;
 }
