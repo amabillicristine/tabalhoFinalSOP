@@ -1,0 +1,170 @@
+Claro! Esse código em linguagem C é um **simulador de algoritmos de substituição de páginas**, usado em sistemas operacionais para gerenciar memória virtual. Ele lê uma sequência de referências de páginas e simula três algoritmos diferentes para determinar quantos **page faults (faltas de página)** ocorreriam com um número específico de quadros de memória.
+
+---
+
+## 🧠 Conceitos Envolvidos
+
+* **Memória virtual**: Técnica em que o sistema operacional usa uma parte do disco como memória para simular mais RAM.
+* **Quadros (frames)**: Blocos fixos de memória física onde páginas são carregadas.
+* **Page fault**: Ocorre quando uma página necessária não está presente na memória, exigindo sua carga.
+* **Algoritmos de substituição de páginas**:
+
+  * **FIFO (First-In, First-Out)**: Substitui a página mais antiga.
+  * **LRU (Least Recently Used)**: Substitui a página menos recentemente usada.
+  * **Ótimo (OPT)**: Substitui a página que **será usada mais tarde**, ou que **não será mais usada** — exige conhecimento do futuro (teórico).
+
+---
+
+## 🧩 Estrutura Geral do Código
+
+O código tem a seguinte estrutura:
+
+1. **Constantes e includes** (`MAX_REFS`, `stdio.h`, `stdlib.h`)
+2. Três funções principais:
+
+   * `simula_fifo()`
+   * `simula_lru()`
+   * `simula_opt()`
+3. `main()`:
+
+   * Lê número de quadros da linha de comando.
+   * Lê referências de página da entrada padrão (`stdin`).
+   * Executa os três algoritmos e imprime os resultados.
+
+---
+
+## 📦 simula\_fifo()
+
+```c
+int simula_fifo(int frames, int* refs, int n_refs)
+```
+
+### Objetivo:
+
+Simular a substituição de páginas usando FIFO.
+
+### Funcionamento:
+
+* Usa um vetor `memoria[frames]` para representar os quadros.
+* Percorre todas as referências de página.
+* Verifica se a página já está em memória:
+
+  * Se sim: ignora.
+  * Se não: substitui na posição `pos`, que avança ciclicamente (como uma fila circular).
+* Conta os page faults.
+
+### Resumo:
+
+Substitui sempre a **página mais antiga carregada**.
+
+---
+
+## 🧮 simula\_lru()
+
+```c
+int simula_lru(int frames, int* refs, int n_refs)
+```
+
+### Objetivo:
+
+Simular a substituição de páginas usando LRU.
+
+### Funcionamento:
+
+* Usa:
+
+  * `memoria[frames]` — páginas atuais na memória.
+  * `ultima_vez[frames]` — a última vez (índice) que cada página foi usada.
+* Para cada referência:
+
+  * Se a página já estiver na memória, atualiza `ultima_vez`.
+  * Se não estiver:
+
+    * Substitui a página com **menor valor de `ultima_vez`**.
+    * Atualiza `ultima_vez` com o índice atual.
+    * Conta um page fault.
+
+### Resumo:
+
+Substitui a **página que foi usada há mais tempo**.
+
+---
+
+## 🔮 simula\_opt()
+
+```c
+int simula_opt(int frames, int* refs, int n_refs)
+```
+
+### Objetivo:
+
+Simular o algoritmo Ótimo (teórico).
+
+### Funcionamento:
+
+* Usa `memoria[frames]`.
+* Para cada referência:
+
+  * Se a página já estiver na memória: continua.
+  * Se não:
+
+    * Para cada página na memória, verifica **quando ela será usada novamente** (olhando o futuro).
+    * Escolhe para substituir a página que **demorará mais para ser usada** (ou que **nunca será usada novamente**).
+    * Conta um page fault.
+
+### Resumo:
+
+Substitui a página que **mais demorará a ser usada**.
+
+---
+
+## 🏁 main()
+
+```c
+int main(int argc, char* argv[])
+```
+
+### Objetivo:
+
+Ler a entrada, executar os algoritmos e mostrar o resultado.
+
+### Passos:
+
+1. Verifica se o número de argumentos está correto.
+2. Lê o número de quadros (`num_quadros`).
+3. Aloca um vetor `referencias` com até `MAX_REFS` posições.
+4. Lê da entrada padrão uma sequência de números (referências de página).
+5. Executa `simula_fifo`, `simula_lru`, e `simula_opt`.
+6. Imprime a saída no formato:
+
+   ```
+   <quadros> quadros, <refs> refs, FIFO: <pf_fifo> PFs, LRU: <pf_lru> PFs, OPT: <pf_opt> PFs
+   ```
+
+### Exemplo de execução:
+
+Se você tiver um arquivo `referencias.txt` com:
+
+```
+1 2 3 4 1 2 5 1 2 3 4 5
+```
+
+E rodar o programa com:
+
+```bash
+./simulador 3 < referencias.txt
+```
+
+Saída possível:
+
+```
+    3 quadros,      12 refs, FIFO:     9 PFs, LRU:     8 PFs, OPT:     7 PFs
+```
+
+---
+
+## ✅ Conclusão
+
+Esse simulador compara **eficiência de algoritmos de substituição de páginas**. Ele mostra como o comportamento varia conforme a estratégia usada e o número de quadros disponíveis. Muito útil para estudos de **gerência de memória em Sistemas Operacionais**.
+
+Se quiser, posso gerar gráficos com os resultados ou ajudar a incluir mais algoritmos como **CLOCK** ou **NRU**. Deseja isso?
