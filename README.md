@@ -1,162 +1,148 @@
-# Simulador de Memória Virtual
+# Simulador de Algoritmos de Substituição de Páginas
 
-Simulador dos algoritmos de substituição de páginas: FIFO, LRU e OPT.
+Este programa simula três algoritmos clássicos de substituição de páginas em sistemas de memória virtual:
+- **FIFO** (First In, First Out)
+- **LRU** (Least Recently Used)
+- **OPT** (Optimal/Ótimo)
 
-## Estrutura do Projeto
+## 📋 Pré-requisitos
 
-```
-📁 tabalhoFinalSOP/
-├── 📄 main.c                    # Código principal do simulador
-├── 📄 Makefile                  # Automação de compilação e testes
-├── 📄 README.md                 # Este arquivo
-├── 📄 arquivo1.txt              # Arquivo de teste 1 (24 referências)
-├── 📄 arquivo2.txt              # Arquivo de teste 2 (30 referências)
-├── 📄 vsim-gcc.txt              # Arquivo de teste grande (1M+ referências)
-└── 📁 relatorios/               # Pasta com relatórios e análises
-    ├── 📄 *.png                 # Gráficos de análise
-    ├── 📄 *.csv                 # Dados de performance
-    ├── 📄 *.txt                 # Relatórios de teste
-    ├── 📄 *.md                  # Documentação adicional
-    ├── 📄 *.bat, *.ps1          # Scripts auxiliares
-    └── 📁 scripts/              # Scripts Python para análise
-        ├── 📄 simulador.py      # Simulador em Python
-        ├── 📄 gerar_graficos.py # Geração de gráficos
-        └── 📄 teste_rapido.py   # Testes automatizados
-```
+- Compilador GCC instalado no sistema
+- Sistema operacional Windows (CMD ou PowerShell)
 
-## Como usar
+## 🔨 Compilação
 
-### Pré-requisitos
-- GCC (MinGW no Windows) instalado e configurado no PATH
-- Para Windows: instale MinGW-w64 ou use o compilador via MSYS2
+Para compilar o programa, execute o seguinte comando no terminal:
 
-### Compilação
-
-#### Windows (CMD/PowerShell)
-```cmd
-gcc -Wall -Wextra -std=c99 main.c -o simulador.exe
-```
-
-#### Linux/Mac
 ```bash
-gcc -Wall -Wextra -std=c99 main.c -o simulador
+gcc main.c -o main.exe
 ```
 
-### Execução com arquivos de teste
+## 🚀 Execução
 
-#### Windows CMD
+### Sintaxe
+```bash
+main.exe <numero_de_quadros> < arquivo_de_referencias
+```
+
+Onde:
+- `<numero_de_quadros>`: Número de quadros de página disponíveis na memória
+- `<arquivo_de_referencias>`: Arquivo contendo a sequência de referências às páginas
+
+## 📄 Exemplos de Uso
+
+### No CMD:
 ```cmd
-# Testar com arquivo1.txt usando 3 frames
-type arquivo1.txt | simulador.exe 3
+# Compilar o programa
+gcc main.c -o main.exe
 
-# Testar com arquivo2.txt usando 4 frames  
-type arquivo2.txt | simulador.exe 4
+# Teste com arquivo1.txt usando 4 quadros
+main.exe 4 < arquivo1.txt
 
-# Testar com vsim-gcc.txt (primeiras 100 linhas) usando 8 frames
-powershell "Get-Content vsim-gcc.txt | Select-Object -First 100" | simulador.exe 8
+# Teste com arquivo2.txt usando 3 quadros
+main.exe 3 < arquivo2.txt
+
+# Teste com vsim-gcc.txt usando 64 quadros
+main.exe 64 < vsim-gcc.txt
+
+# Teste com vsim-gcc.txt usando 256 quadros
+main.exe 256 < vsim-gcc.txt
+
+# Teste com vsim-gcc.txt usando 1024 quadros
+main.exe 1024 < vsim-gcc.txt
+
+# Teste com vsim-gcc.txt usando 4096 quadros
+main.exe 4096 < vsim-gcc.txt
+
+# Comparação com diferentes números de quadros
+main.exe 1 < arquivo1.txt
+main.exe 2 < arquivo1.txt
+main.exe 3 < arquivo1.txt
+main.exe 4 < arquivo1.txt
+main.exe 5 < arquivo1.txt
+main.exe 6 < arquivo1.txt
+main.exe 7 < arquivo1.txt
 ```
 
-#### Windows PowerShell
+### No PowerShell:
 ```powershell
-# Testar com arquivo1.txt
-Get-Content arquivo1.txt | .\simulador.exe 3
+# Compilar o programa
+gcc main.c -o main.exe
 
-# Testar com arquivo2.txt
-Get-Content arquivo2.txt | .\simulador.exe 4
+# Teste com arquivo1.txt usando 4 quadros
+Get-Content arquivo1.txt | .\main.exe 4
 
-# Testar com vsim-gcc.txt (primeiras 1000 linhas)
-Get-Content vsim-gcc.txt | Select-Object -First 1000 | .\simulador.exe 16
+# Teste com arquivo2.txt usando 3 quadros
+Get-Content arquivo2.txt | .\main.exe 3
+
+# Teste com vsim-gcc.txt usando 64 quadros
+Get-Content vsim-gcc.txt | .\main.exe 64
+
+# Teste com vsim-gcc.txt usando 256 quadros
+Get-Content vsim-gcc.txt | .\main.exe 256
+
+# Teste com vsim-gcc.txt usando 1024 quadros
+Get-Content vsim-gcc.txt | .\main.exe 1024
+
+# Teste com vsim-gcc.txt usando 4096 quadros
+Get-Content vsim-gcc.txt | .\main.exe 4096
+
+# Comparação com diferentes números de quadros
+Get-Content arquivo1.txt | .\main.exe 1
+Get-Content arquivo1.txt | .\main.exe 2
+Get-Content arquivo1.txt | .\main.exe 3
+Get-Content arquivo1.txt | .\main.exe 4
+Get-Content arquivo1.txt | .\main.exe 5
+Get-Content arquivo1.txt | .\main.exe 6
+Get-Content arquivo1.txt | .\main.exe 7
 ```
 
-#### Linux/Mac
-```bash
-./simulador 3 < arquivo1.txt
-./simulador 4 < arquivo2.txt
-head -1000 vsim-gcc.txt | ./simulador 16
+## 📊 Formato da Saída
+
+O programa exibe uma linha com os resultados dos três algoritmos:
+
+```
+    X quadros,       Y refs: FIFO:     Z PFs, LRU:     W PFs, OPT:     V PFs
 ```
 
-### Execução manual
-```bash
-# Windows
-.\simulador.exe 3
+Onde:
+- `X`: Número de quadros de memória utilizados
+- `Y`: Total de referências processadas
+- `Z`: Número de page faults do algoritmo FIFO
+- `W`: Número de page faults do algoritmo LRU
+- `V`: Número de page faults do algoritmo OPT
 
-# Linux/Mac
-./simulador 3
+### Exemplo de saída:
 ```
-Digite as referências de páginas uma por linha e pressione Ctrl+Z (Windows) ou Ctrl+D (Linux) para finalizar.
+    4 quadros,      12 refs: FIFO:     6 PFs, LRU:     7 PFs, OPT:     5 PFs
+```
 
-### Comando completo (compilar, executar e limpar)
+## 🧪 Testes Principais
 
-#### Windows CMD
+### Arquivos 1 e 2 (1 a 7 quadros):
 ```cmd
-gcc -Wall -Wextra -std=c99 main.c -o temp.exe && type arquivo1.txt | temp.exe 3 && del temp.exe
+# CMD
+for %i in (1 2 3 4 5 6 7) do main.exe %i < arquivo1.txt
+
+# PowerShell
+1..7 | ForEach-Object { Get-Content arquivo1.txt | .\main.exe $_ }
 ```
 
-#### Windows PowerShell
-```powershell
-gcc -Wall -Wextra -std=c99 main.c -o temp.exe; if ($?) { Get-Content arquivo1.txt | .\temp.exe 3; Remove-Item temp.exe }
-```
-
-## Exemplos de uso
-
-### Teste básico com arquivo1.txt
+### Arquivo vsim-gcc.txt (64, 256, 1024, 4096 quadros):
 ```cmd
-gcc -Wall -Wextra -std=c99 main.c -o simulador.exe
-type arquivo1.txt | simulador.exe 3
-```
-**Saída esperada:**
-```
-    3 quadros,      24 refs, FIFO:    15 PFs, LRU:    14 PFs, OPT:    11 PFs
-```
+# CMD
+main.exe 64 < vsim-gcc.txt
+main.exe 256 < vsim-gcc.txt
+main.exe 1024 < vsim-gcc.txt
+main.exe 4096 < vsim-gcc.txt
 
-### Teste com arquivo2.txt
-```cmd
-type arquivo2.txt | simulador.exe 4
-```
-**Saída esperada:**
-```
-    4 quadros,      30 refs, FIFO:    10 PFs, LRU:     8 PFs, OPT:     7 PFs
+# PowerShell
+64,256,1024,4096 | ForEach-Object { Get-Content vsim-gcc.txt | .\main.exe $_ }
 ```
 
-### Teste de performance com vsim-gcc.txt
-```cmd
-powershell "Get-Content vsim-gcc.txt | Select-Object -First 1000" | simulador.exe 64
-```
-
-### Comparação de diferentes números de frames
-```cmd
-# 2 frames
-type arquivo1.txt | simulador.exe 2
-
-# 3 frames  
-type arquivo1.txt | simulador.exe 3
-
-# 4 frames
-type arquivo1.txt | simulador.exe 4
-```
-
-## Makefile (opcional)
-
-Para facilitar os testes, você pode usar os comandos do Makefile:
-
-```cmd
-# Compilar e executar sem deixar arquivos
-make run-arquivo1
-
-# Testes com diferentes frames
-make test-arquivo1-frames
-
-# Testes com arquivo2
-make test-arquivo2
-
-# Teste de performance com vsim-gcc
-make test-vsim-performance
-```
-
-## Notas importantes
+## ⚠️ Notas Importantes
 
 - O programa lê as referências de páginas da entrada padrão
-- Use números de frames apropriados para cada teste (geralmente 2-16)
-- Para arquivos grandes como vsim-gcc.txt, use amostras menores para testes rápidos
-- O algoritmo OPT sempre terá o menor número de page faults (é o algoritmo ótimo)
+- O algoritmo OPT sempre apresenta o menor número de page faults (ótimo teórico)
 - FIFO e LRU podem variar dependendo do padrão de acesso às páginas
+- Para arquivos grandes como vsim-gcc.txt, o processamento pode levar alguns segundos
